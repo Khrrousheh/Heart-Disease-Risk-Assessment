@@ -3,41 +3,115 @@
 <head>
     <title>Your Heart Disease Risk Results</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-        .result-card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px; }
-        .high-risk { background-color: #ffdddd; border-color: #ff9999; }
-        .moderate-risk { background-color: #fff3cd; border-color: #ffeeba; }
-        .low-risk { background-color: #d4edda; border-color: #c3e6cb; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .result-container { background-color: #f9f9f9; padding: 25px; border-radius: 8px; }
+        h1 { color: #2c3e50; text-align: center; }
+        h2 { color: #3498db; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .risk-card {
+            padding: 20px; margin: 25px 0; border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .high-risk { background-color: #ffdddd; border-left: 5px solid #e74c3c; }
+        .moderate-risk { background-color: #fff3cd; border-left: 5px solid #f39c12; }
+        .low-risk { background-color: #d4edda; border-left: 5px solid #2ecc71; }
+        .risk-value {
+            font-size: 2.5em; font-weight: bold; text-align: center;
+            margin: 10px 0;
+        }
+        .risk-category {
+            font-size: 1.5em; text-align: center; font-weight: bold;
+            margin-bottom: 15px;
+        }
         ul { padding-left: 20px; }
-        li { margin-bottom: 8px; }
+        li { margin-bottom: 10px; line-height: 1.5; }
+        .details-section { margin: 30px 0; }
+        .factor-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .factor-item { background-color: white; padding: 10px; border-radius: 4px; }
+        .factor-label { font-weight: bold; color: #7f8c8d; }
+        .back-link {
+            display: inline-block; margin-top: 20px; color: #3498db;
+            text-decoration: none; font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <h1>Your Heart Disease Risk Assessment</h1>
+    <div class="result-container">
+        <h1>Your Heart Disease Risk Assessment</h1>
 
-    <div class="result-card {{ 'high-risk' if risk_result.risk_category == 'High' else 'moderate-risk' if risk_result.risk_category == 'Moderate' else 'low-risk' }}">
-        <h2>Your 10-Year Risk: {{ risk_result.risk_percentage }}%</h2>
-        <h3>Risk Category: {{ risk_result.risk_category }}</h3>
+        <div class="risk-card {{ 'high-risk' if risk_result.risk_category == 'High' else 'moderate-risk' if risk_result.risk_category == 'Moderate' else 'low-risk' }}">
+            <div class="risk-value">{{ risk_result.risk_percentage }}%</div>
+            <div class="risk-category">{{ risk_result.risk_category }} Risk</div>
+            <p style="text-align: center;">
+                10-year risk of cardiovascular disease (heart attack or stroke)
+            </p>
+        </div>
+
+        <div class="details-section">
+            <h2>Personalized Recommendations</h2>
+            <ul>
+                {% for recommendation in recommendations %}
+                <li>{{ recommendation }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if risk_result.risk_category == "High" %}
+            <p><strong>Important:</strong> Please consult with a healthcare professional about your results.</p>
+            {% endif %}
+        </div>
+
+        <div class="details-section">
+            <h2>About Your Calculation</h2>
+            <p>This assessment uses the Framingham Risk Score, a clinically validated tool for estimating
+            10-year cardiovascular risk. Your results are based on:</p>
+
+            <div class="factor-list">
+                <div class="factor-item">
+                    <span class="factor-label">Age:</span> {{ factors.age }} years
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">Gender:</span> {{ factors.gender|capitalize }}
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">Total Cholesterol:</span> {{ factors.total_cholesterol }} mg/dL
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">HDL Cholesterol:</span> {{ factors.hdl_cholesterol }} mg/dL
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">Systolic BP:</span> {{ factors.systolic_bp }} mmHg
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">BP Medication:</span> {{ "Yes" if factors.bp_treated else "No" }}
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">Smoker:</span> {{ "Yes" if factors.smoker else "No" }}
+                </div>
+                <div class="factor-item">
+                    <span class="factor-label">Diabetic:</span> {{ "Yes" if factors.diabetic else "No" }}
+                </div>
+            </div>
+
+            <p style="margin-top: 20px;">
+                <strong>Framingham Points:</strong> {{ risk_result.points }}<br>
+                <small>Risk thresholds:
+                    {% if factors.gender == "male" %}
+                    Low (<6%), Moderate (6-19%), High (≥20%)
+                    {% else %}
+                    Low (<5%), Moderate (5-19%), High (≥20%)
+                    {% endif %}
+                </small>
+            </p>
+        </div>
+
+        <div class="details-section">
+            <h2>Disclaimer</h2>
+            <p>This tool provides estimates only and is not a substitute for professional medical advice.
+            Many factors contribute to heart disease risk. Consult your healthcare provider for
+            personalized assessment and guidance.</p>
+        </div>
+
+        <a href="/" class="back-link">← Calculate Another Assessment</a>
     </div>
-
-    <h2>Recommendations:</h2>
-    <ul>
-        {% for recommendation in recommendations %}
-        <li>{{ recommendation }}</li>
-        {% endfor %}
-    </ul>
-
-    <h2>Your Submitted Values:</h2>
-    <ul>
-        <li>Age: {{ factors.age }} years</li>
-        <li>Gender: {{ factors.gender }}</li>
-        <li>Total Cholesterol: {{ factors.total_cholesterol }} mg/dL</li>
-        <li>HDL Cholesterol: {{ factors.hdl_cholesterol }} mg/dL</li>
-        <li>Systolic Blood Pressure: {{ factors.systolic_bp }} mmHg</li>
-        <li>Smoker: {{ "Yes" if factors.smoker else "No" }}</li>
-        <li>Diabetic: {{ "Yes" if factors.diabetic else "No" }}</li>
-    </ul>
-
-    <p><a href="/">Calculate another risk assessment</a></p>
 </body>
 </html>
