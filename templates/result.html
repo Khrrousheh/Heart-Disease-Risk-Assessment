@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Heart Disease Risk Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .result-card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px; }
+        .high-risk { background-color: #ffdddd; border-color: #ff9999; }
+        .moderate-risk { background-color: #fff3cd; border-color: #ffeeba; }
+        .low-risk { background-color: #d4edda; border-color: #c3e6cb; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Your Heart Disease Risk Assessment</h1>
+
+    <div class="result-card {{ 'high-risk' if risk_result.risk_category == 'High' else 'moderate-risk' if risk_result.risk_category == 'Moderate' else 'low-risk' }}">
+        <h2>Your 10-Year Risk: {{ risk_result.risk_percentage }}%</h2>
+        <h3>Risk Category: {{ risk_result.risk_category }}</h3>
+    </div>
+
+    <h2>Recommendations:</h2>
+    <ul>
+        {% for recommendation in recommendations %}
+        <li>{{ recommendation }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Your Submitted Values:</h2>
+    <ul>
+        <li>Age: {{ factors.age }} years</li>
+        <li>Gender: {{ factors.gender }}</li>
+        <li>Total Cholesterol: {{ factors.total_cholesterol }} mg/dL</li>
+        <li>HDL Cholesterol: {{ factors.hdl_cholesterol }} mg/dL</li>
+        <li>Systolic Blood Pressure: {{ factors.systolic_bp }} mmHg</li>
+        <li>Smoker: {{ "Yes" if factors.smoker else "No" }}</li>
+        <li>Diabetic: {{ "Yes" if factors.diabetic else "No" }}</li>
+    </ul>
+
+    <p><a href="/">Calculate another risk assessment</a></p>
+</body>
+</html>
